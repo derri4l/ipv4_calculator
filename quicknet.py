@@ -27,38 +27,10 @@ def save_to_csv(data, filename='subnet_details.csv'):
             writer.writeheader()
         writer.writerow(data)
 
-def format_long_content(key, value, max_width=80):
-    """Format long content to wrap properly"""
-    if len(str(value)) <= max_width:
-        return f"{key}: {value}"
-    
-    # Split long content into multiple lines with proper indentation
-    lines = [f"{key}:"]
-    indent = "  "  # 2 spaces for indentation
-    
-    if "," in str(value) and value != "None":
-        # For comma-separated values, show each on new line
-        items = str(value).split(", ")
-        for item in items:
-            lines.append(f"{indent}{item}")
-    else:
-        # For other long content, wrap at max_width
-        content = str(value)
-        while len(content) > max_width:
-            # Find last space before max_width
-            break_point = content.rfind(' ', 0, max_width)
-            if break_point == -1:  # No space found, break at max_width
-                break_point = max_width
-            lines.append(f"{indent}{content[:break_point]}")
-            content = content[break_point:].strip()
-        if content:  # Add remaining content
-            lines.append(f"{indent}{content}")
-    
-    return "\n".join(lines)
 
 def main():
-    filename = 'network_session.csv'
-    print("Welcome to the Private IPv4 Subnet Calculator!")
+    filename = 'quicknet_session.csv'
+    print("Welcome to QuickNet - the Private IPv4 Subnet Calculator!")
     print("Input eg: 192.168.10.0/24\n(Use ctrl+C to exit anytime)\n")
 
     while True:
@@ -71,7 +43,7 @@ def main():
             info = subnet_details(ip_cidr)
             print("\nSubnet Details:")
             for k, v in info.items():                                                               #key and value from dict
-                print(format_long_content(k, v))
+                print(f"{k}: {v}")
 
             choice = input("\nSave to CSV? (y/n): ").strip().lower()
             if choice == 'y':
@@ -143,7 +115,7 @@ def plan_my_network(ip_cidr, session_file):
     save_to_csv(data, session_file)
     print("\nNetwork Plan:")
     for k, v in data.items():
-        print(format_long_content(k, v))
+        print(f"{k}: {v}")
     print(f"\nNetwork plan saved to {session_file}")
 
 if __name__ == "__main__":
