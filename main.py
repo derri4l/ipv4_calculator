@@ -40,7 +40,7 @@ def main():
 
             info = subnet_details(ip_cidr)
             print("\nSubnet Details:")
-            for k, v in info.items():
+            for k, v in info.items():                                                               #key and value from dict
                 print(f"{k}: {v}")
 
             choice = input("\nSave to CSV? (y/n): ").strip().lower()
@@ -49,8 +49,11 @@ def main():
                 print(f"Subnet details saved to {filename}")
 
             pmn = input("Continue to Plan My Network? (y/n): ").strip().lower()
-            if pmn != 'y':
+            if pmn == 'y':
                 print("\nStarting Plan My Network...")
+                break
+            elif pmn == 'n':
+                print("Exiting...")
                 break
         except KeyboardInterrupt:
             print("\nExiting...")
