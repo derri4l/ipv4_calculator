@@ -1,7 +1,6 @@
 # QuickNet - the Private IPv4 Subnet Calculator
 A lightweight IPv4 subnet calculator + basic network planner for subnetting and IP management basics.
 
----
  ## How does it work
  - It first validates that the input is a private IPV4 subnet (10.x.x.x, 172.16–31.x.x, 192.168.x.x).
  - Shows network address, broadcast address, what hosts are usable and the default gateway.
