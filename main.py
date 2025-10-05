@@ -1,5 +1,6 @@
 import ipaddress
 import csv
+import random 
 
 # Function to check if an IP address is a private IPv4 address
 def is_private_ipv4(ip_cidr): 
@@ -50,7 +51,7 @@ def main():
 
             pmn = input("Continue to Plan My Network? (y/n): ").strip().lower()
             if pmn == 'y':
-                print("\nStarting Plan My Network...")
+                plan_my_network(ip_cidr, filename)
                 break
             elif pmn == 'n':
                 print("Exiting...")
@@ -63,3 +64,61 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# Plan my network
+def plan_my_network(ip_cidr, session_file):
+    net = ipaddress.ip_network(ip_cidr, strict=False)
+    all_hosts = list(net.hosts())
+
+    print("\nWelcome to Plan My Network")
+    print("Enter 0 for none or type 'randomize' where available.\n")
+
+    # Static assignments
+    static_choice = input("To assign static IPs, do: (eg. 192.168.1.5,192.168.1.8 OR '0' OR randomize): ")
+    if static_choice == "0":
+        static_ips = []
+    elif static_choice.lower() == "randomize":
+        static_ips = random.sample(all_hosts, min(10, len(all_hosts)))  # random 10 static IPs
+    else:
+        static_ips = [ipaddress.ip_address(ip.strip()) for ip in static_choice.split(',')]
+    
+    # Dynamic assignments
+    dhcp_choice = input("To assign dynamic IPs, do: (eg. 10.0.0.100-150 OR '0' OR randomize):")
+    if dhcp_choice == "0":
+        dhcp_range = []
+    else:
+        try:
+            base, rng = dhcp_choice.split(".")[:-1], dhcp_choice.split(".")[-1]
+            start, end = map(int, rng.split('-'))
+            prefix = ".".join(base)
+            dhcp_range = [ipaddress.ip_address(f"{prefix}.{i}") for i in range(start, end + 1)]
+        except:
+            print("Invalid range format. Skipping DHCP range.")
+            dhcp_range = []
+
+    
+    # VLANs
+    vlan_choice = input("VLANs (eg. 10,20,30, OR '0' OR randomize): ").strip()
+    vlans = []
+    if vlan_choice == "0":
+        vlans = []
+    elif vlan_choice.lower() == "randomize":
+        vlans = random.sample(range(1, 500), min(5, 500))  # random 5 VLANs
+    else:
+        vlans = [int(v.strip()) for v in vlan_choice.split(",")]
+
+    data = {
+        "Subnet": str(net),
+        "Static IPs": ", ".join(map(str, static_ips)) if static_ips else "None",
+        "DHCP Range": ", ".join(map(str, dhcp_range)) if dhcp_range else "None",
+        "VLANs": ", ".join(map(str, vlans)) if vlans else "None"
+    }
+    
+    # Save to CSV and display results
+    save_to_csv(data, session_file)
+    print("\nNetwork Plan:")
+    for k, v in data.items():
+        print(f"{k}: {v}")
+    print(f"\nNetwork plan saved to {session_file}")
+
+
